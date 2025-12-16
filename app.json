@@ -1,0 +1,14 @@
+{
+  "expo": {
+    "name": "LumiaWallet",
+    "slug": "lumia-wallet",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "splash": {
+      "backgroundColor": "#8B5CF6"
+    },
+    "android": {
+      "package": "com.lumia.wallet"
+    }
+  }
+}
