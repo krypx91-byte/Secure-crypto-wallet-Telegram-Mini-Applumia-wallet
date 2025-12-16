@@ -4380,8 +4380,179 @@
         </div>
 
         <script>
+            // ========================================
+            // TELEGRAM WEBAPP INTEGRATION
+            // ========================================
+
+            // Initialize Telegram WebApp
+            const tg = window.Telegram.WebApp;
+
+            // Expand app to full height
+            tg.expand();
+
+            // Enable closing confirmation
+            tg.enableClosingConfirmation();
+
+            // Get user data from Telegram
+            const telegramUser = tg.initDataUnsafe?.user;
+            console.log('Telegram User:', telegramUser);
+
+            // ========================================
+            // THEME SYNCHRONIZATION
+            // ========================================
+
+            function syncTelegramTheme() {
+                const body = document.body;
+                const isDark = tg.colorScheme === 'dark';
+
+                if (isDark) {
+                    body.classList.remove('light-mode');
+                } else {
+                    body.classList.add('light-mode');
+                }
+
+                // Apply Telegram theme colors
+                document.documentElement.style.setProperty('--tg-theme-bg-color', tg.themeParams.bg_color || '#0a0a0a');
+                document.documentElement.style.setProperty('--tg-theme-text-color', tg.themeParams.text_color || '#E5E7EB');
+                document.documentElement.style.setProperty('--tg-theme-hint-color', tg.themeParams.hint_color || '#9CA3AF');
+                document.documentElement.style.setProperty('--tg-theme-link-color', tg.themeParams.link_color || '#a3e635');
+                document.documentElement.style.setProperty('--tg-theme-button-color', tg.themeParams.button_color || '#a3e635');
+                document.documentElement.style.setProperty('--tg-theme-button-text-color', tg.themeParams.button_text_color || '#000000');
+            }
+
+            // Listen for theme changes
+            tg.onEvent('themeChanged', syncTelegramTheme);
+
+            // Apply theme on load
+            syncTelegramTheme();
+
+            // ========================================
+            // HAPTIC FEEDBACK
+            // ========================================
+
+            function hapticFeedback(type = 'light') {
+                if (tg.HapticFeedback) {
+                    switch (type) {
+                        case 'light':
+                            tg.HapticFeedback.impactOccurred('light');
+                            break;
+                        case 'medium':
+                            tg.HapticFeedback.impactOccurred('medium');
+                            break;
+                        case 'heavy':
+                            tg.HapticFeedback.impactOccurred('heavy');
+                            break;
+                        case 'success':
+                            tg.HapticFeedback.notificationOccurred('success');
+                            break;
+                        case 'error':
+                            tg.HapticFeedback.notificationOccurred('error');
+                            break;
+                        case 'warning':
+                            tg.HapticFeedback.notificationOccurred('warning');
+                            break;
+                    }
+                }
+            }
+
+            // ========================================
+            // CLOUD STORAGE
+            // ========================================
+
+            function saveToCloud(key, value) {
+                if (tg.CloudStorage) {
+                    tg.CloudStorage.setItem(key, JSON.stringify(value), (error) => {
+                        if (error) {
+                            console.error('Cloud storage error:', error);
+                        }
+                    });
+                }
+            }
+
+            function loadFromCloud(key, callback) {
+                if (tg.CloudStorage) {
+                    tg.CloudStorage.getItem(key, (error, value) => {
+                        if (!error && value) {
+                            callback(JSON.parse(value));
+                        }
+                    });
+                }
+            }
+
+            // ========================================
+            // MAIN BUTTON MANAGEMENT
+            // ========================================
+
+            let currentMainButtonAction = null;
+
+            function showMainButton(text, action) {
+                tg.MainButton.setText(text);
+                tg.MainButton.show();
+
+                // Remove previous listener if exists
+                if (currentMainButtonAction) {
+                    tg.MainButton.offClick(currentMainButtonAction);
+                }
+
+                // Set new action
+                currentMainButtonAction = action;
+                tg.MainButton.onClick(action);
+
+                // Enable button
+                tg.MainButton.enable();
+            }
+
+            function hideMainButton() {
+                tg.MainButton.hide();
+                if (currentMainButtonAction) {
+                    tg.MainButton.offClick(currentMainButtonAction);
+                    currentMainButtonAction = null;
+                }
+            }
+
+            function setMainButtonLoading(loading) {
+                if (loading) {
+                    tg.MainButton.showProgress();
+                } else {
+                    tg.MainButton.hideProgress();
+                }
+            }
+
+            // ========================================
+            // BACK BUTTON MANAGEMENT
+            // ========================================
+
+            let currentBackButtonAction = null;
+
+            function showBackButton(action) {
+                // Remove previous listener if exists
+                if (currentBackButtonAction) {
+                    tg.BackButton.offClick(currentBackButtonAction);
+                }
+
+                // Set new action
+                currentBackButtonAction = action;
+                tg.BackButton.onClick(action);
+                tg.BackButton.show();
+            }
+
+            function hideBackButton() {
+                tg.BackButton.hide();
+                if (currentBackButtonAction) {
+                    tg.BackButton.offClick(currentBackButtonAction);
+                    currentBackButtonAction = null;
+                }
+            }
+
+            // ========================================
+            // NAVIGATION SYSTEM (Enhanced with Telegram)
+            // ========================================
+
             // Navigation system
             function navigateTo(screenId) {
+                // Haptic feedback on navigation
+                hapticFeedback('light');
+
                 // Hide all screens
                 document.querySelectorAll('.screen').forEach(screen => {
                     screen.classList.remove('active');
@@ -4392,6 +4563,84 @@
 
                 // Scroll to top
                 window.scrollTo(0, 0);
+
+                // Manage Telegram BackButton and MainButton based on screen
+                manageTelegramButtons(screenId);
+            }
+
+            function manageTelegramButtons(screenId) {
+                // Hide both buttons by default
+                hideBackButton();
+                hideMainButton();
+
+                // Define screens that need back button
+                const screensWithBack = [
+                    'screen-security', 'screen-features', 'screen-generate-seed',
+                    'screen-import', 'screen-verify-seed', 'screen-security-setup',
+                    'screen-send-select', 'screen-send-amount', 'screen-send-confirm',
+                    'screen-receive', 'screen-swap', 'screen-nft-gallery', 'screen-asset-detail'
+                ];
+
+                if (screensWithBack.includes(screenId)) {
+                    showBackButton(() => {
+                        hapticFeedback('light');
+                        // Determine previous screen based on current screen
+                        const backMap = {
+                            'screen-security': 'screen-welcome',
+                            'screen-features': 'screen-security',
+                            'screen-generate-seed': 'screen-create-or-import',
+                            'screen-import': 'screen-create-or-import',
+                            'screen-verify-seed': 'screen-generate-seed',
+                            'screen-security-setup': 'screen-verify-seed',
+                            'screen-send-select': 'screen-home',
+                            'screen-send-amount': 'screen-send-select',
+                            'screen-send-confirm': 'screen-send-amount',
+                            'screen-receive': 'screen-home',
+                            'screen-swap': 'screen-home',
+                            'screen-nft-gallery': 'screen-home',
+                            'screen-asset-detail': 'screen-home'
+                        };
+                        navigateTo(backMap[screenId] || 'screen-home');
+                    });
+                }
+
+                // Define screens with MainButton actions
+                switch (screenId) {
+                    case 'screen-welcome':
+                        showMainButton('GET STARTED', () => {
+                            hapticFeedback('medium');
+                            navigateTo('screen-security');
+                        });
+                        break;
+                    case 'screen-security':
+                        showMainButton('CONTINUE', () => {
+                            hapticFeedback('medium');
+                            navigateTo('screen-features');
+                        });
+                        break;
+                    case 'screen-features':
+                        showMainButton("LET'S GO!", () => {
+                            hapticFeedback('medium');
+                            navigateTo('screen-create-or-import');
+                        });
+                        break;
+                    case 'screen-swap':
+                        showMainButton('REVIEW SWAP', () => {
+                            hapticFeedback('medium');
+                            openSwapConfirm();
+                        });
+                        break;
+                    case 'screen-send-confirm':
+                        showMainButton('CONFIRM SEND', () => {
+                            hapticFeedback('success');
+                            setMainButtonLoading(true);
+                            setTimeout(() => {
+                                setMainButtonLoading(false);
+                                navigateTo('screen-send-success');
+                            }, 2000);
+                        });
+                        break;
+                }
             }
 
             // Dark Mode Toggle
