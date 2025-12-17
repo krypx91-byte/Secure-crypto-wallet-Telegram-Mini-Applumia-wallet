@@ -4407,17 +4407,17 @@
                 // Always use dark mode, ignore Telegram theme
                 body.classList.remove('light-mode');
 
-                // Apply Telegram theme colors
-                document.documentElement.style.setProperty('--tg-theme-bg-color', tg.themeParams.bg_color || '#0a0a0a');
-                document.documentElement.style.setProperty('--tg-theme-text-color', tg.themeParams.text_color || '#E5E7EB');
-                document.documentElement.style.setProperty('--tg-theme-hint-color', tg.themeParams.hint_color || '#9CA3AF');
-                document.documentElement.style.setProperty('--tg-theme-link-color', tg.themeParams.link_color || '#a3e635');
-                document.documentElement.style.setProperty('--tg-theme-button-color', tg.themeParams.button_color || '#a3e635');
-                document.documentElement.style.setProperty('--tg-theme-button-text-color', tg.themeParams.button_text_color || '#000000');
+                // Don't apply Telegram theme colors - use our own dark theme
+                // document.documentElement.style.setProperty('--tg-theme-bg-color', tg.themeParams.bg_color || '#0a0a0a');
+                // document.documentElement.style.setProperty('--tg-theme-text-color', tg.themeParams.text_color || '#E5E7EB');
+                // document.documentElement.style.setProperty('--tg-theme-hint-color', tg.themeParams.hint_color || '#9CA3AF');
+                // document.documentElement.style.setProperty('--tg-theme-link-color', tg.themeParams.link_color || '#a3e635');
+                // document.documentElement.style.setProperty('--tg-theme-button-color', tg.themeParams.button_color || '#a3e635');
+                // document.documentElement.style.setProperty('--tg-theme-button-text-color', tg.themeParams.button_text_color || '#000000');
             }
 
-            // Listen for theme changes
-            tg.onEvent('themeChanged', syncTelegramTheme);
+            // Don't listen for theme changes - keep dark mode always
+            // tg.onEvent('themeChanged', syncTelegramTheme);
 
             // Apply theme on load
             syncTelegramTheme();
