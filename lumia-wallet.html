@@ -4390,6 +4390,10 @@
             // Expand app to full height
             tg.expand();
 
+            // Hide Telegram buttons (we use our own)
+            tg.MainButton.hide();
+            tg.BackButton.hide();
+
             // Enable closing confirmation
             tg.enableClosingConfirmation();
 
@@ -4482,24 +4486,28 @@
             let currentMainButtonAction = null;
 
             function showMainButton(text, action) {
-                // Disabled Telegram MainButton
-                // tg.MainButton.setText(text);
-                // tg.MainButton.show();
-                // if (currentMainButtonAction) {
-                //     tg.MainButton.offClick(currentMainButtonAction);
-                // }
-                // currentMainButtonAction = action;
-                // tg.MainButton.onClick(action);
-                // tg.MainButton.enable();
+                tg.MainButton.setText(text);
+                tg.MainButton.show();
+
+                // Remove previous listener if exists
+                if (currentMainButtonAction) {
+                    tg.MainButton.offClick(currentMainButtonAction);
+                }
+
+                // Set new action
+                currentMainButtonAction = action;
+                tg.MainButton.onClick(action);
+
+                // Enable button
+                tg.MainButton.enable();
             }
 
             function hideMainButton() {
-                // Disabled
-                // tg.MainButton.hide();
-                // if (currentMainButtonAction) {
-                //     tg.MainButton.offClick(currentMainButtonAction);
-                //     currentMainButtonAction = null;
-                // }
+                tg.MainButton.hide();
+                if (currentMainButtonAction) {
+                    tg.MainButton.offClick(currentMainButtonAction);
+                    currentMainButtonAction = null;
+                }
             }
 
             function setMainButtonLoading(loading) {
@@ -4517,22 +4525,23 @@
             let currentBackButtonAction = null;
 
             function showBackButton(action) {
-                // Disabled Telegram BackButton
-                // if (currentBackButtonAction) {
-                //     tg.BackButton.offClick(currentBackButtonAction);
-                // }
-                // currentBackButtonAction = action;
-                // tg.BackButton.onClick(action);
-                // tg.BackButton.show();
+                // Remove previous listener if exists
+                if (currentBackButtonAction) {
+                    tg.BackButton.offClick(currentBackButtonAction);
+                }
+
+                // Set new action
+                currentBackButtonAction = action;
+                tg.BackButton.onClick(action);
+                tg.BackButton.show();
             }
 
             function hideBackButton() {
-                // Disabled
-                // tg.BackButton.hide();
-                // if (currentBackButtonAction) {
-                //     tg.BackButton.offClick(currentBackButtonAction);
-                //     currentBackButtonAction = null;
-                // }
+                tg.BackButton.hide();
+                if (currentBackButtonAction) {
+                    tg.BackButton.offClick(currentBackButtonAction);
+                    currentBackButtonAction = null;
+                }
             }
 
             // ========================================
