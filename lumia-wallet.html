@@ -4404,21 +4404,8 @@
             function syncTelegramTheme() {
                 const body = document.body;
 
-                // Check if we're actually running in Telegram
-                const isInTelegram = tg.initDataUnsafe && tg.initDataUnsafe.user;
-
-                if (isInTelegram) {
-                    // Only sync with Telegram theme if we're in Telegram
-                    const isLight = tg.colorScheme === 'light';
-                    if (isLight) {
-                        body.classList.add('light-mode');
-                    } else {
-                        body.classList.remove('light-mode');
-                    }
-                } else {
-                    // Always use dark mode when not in Telegram
-                    body.classList.remove('light-mode');
-                }
+                // Always use dark mode, ignore Telegram theme
+                body.classList.remove('light-mode');
 
                 // Apply Telegram theme colors
                 document.documentElement.style.setProperty('--tg-theme-bg-color', tg.themeParams.bg_color || '#0a0a0a');
