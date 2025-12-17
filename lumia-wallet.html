@@ -4403,12 +4403,13 @@
 
             function syncTelegramTheme() {
                 const body = document.body;
-                const isDark = tg.colorScheme === 'dark';
+                // Default to dark mode, only use light if explicitly set
+                const isLight = tg.colorScheme === 'light';
 
-                if (isDark) {
-                    body.classList.remove('light-mode');
-                } else {
+                if (isLight) {
                     body.classList.add('light-mode');
+                } else {
+                    body.classList.remove('light-mode');
                 }
 
                 // Apply Telegram theme colors
