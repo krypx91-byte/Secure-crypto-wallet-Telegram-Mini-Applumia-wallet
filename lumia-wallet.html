@@ -4403,12 +4403,20 @@
 
             function syncTelegramTheme() {
                 const body = document.body;
-                // Default to dark mode, only use light if explicitly set
-                const isLight = tg.colorScheme === 'light';
 
-                if (isLight) {
-                    body.classList.add('light-mode');
+                // Check if we're actually running in Telegram
+                const isInTelegram = tg.initDataUnsafe && tg.initDataUnsafe.user;
+
+                if (isInTelegram) {
+                    // Only sync with Telegram theme if we're in Telegram
+                    const isLight = tg.colorScheme === 'light';
+                    if (isLight) {
+                        body.classList.add('light-mode');
+                    } else {
+                        body.classList.remove('light-mode');
+                    }
                 } else {
+                    // Always use dark mode when not in Telegram
                     body.classList.remove('light-mode');
                 }
 
